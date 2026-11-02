@@ -1,0 +1,13 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { categorySlug } from '../data/site';
+interface Props { article: CollectionEntry<'articles'>; index?: number }
+const { article } = Astro.props;
+const date = article.data.updated || article.data.published;
+---
+<article class="article-card">
+  <div class="card-meta"><a href={`/categories/${categorySlug(article.data.category)}/`}>{article.data.category}</a><span>·</span><time datetime={date.toISOString()}>{date.toLocaleDateString('zh-CN', { timeZone:'Asia/Shanghai', year:'numeric', month:'2-digit', day:'2-digit' }).replaceAll('/','.')}</time></div>
+  <h3><a href={`/articles/${article.id}/`}>{article.data.title}</a></h3>
+  <p>{article.data.description}</p>
+  <div class="card-bottom"><span>约 {article.data.readingMinutes} 分钟阅读</span><a href={`/articles/${article.id}/`}>继续阅读 →</a></div>
+</article>

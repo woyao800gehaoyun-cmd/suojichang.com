@@ -1,0 +1,18 @@
+{
+  "name": "soujichang-blog",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev --host 0.0.0.0",
+    "build": "astro build && node scripts/build-preview.mjs",
+    "preview": "astro preview --host 0.0.0.0",
+    "new:post": "node scripts/new-post.mjs",
+    "verify": "npm run build && node scripts/verify.mjs"
+  },
+  "dependencies": {
+    "astro": "^5.16.0",
+    "@astrojs/rss": "^4.0.12",
+    "@astrojs/sitemap": "^3.5.1"
+  }
+}

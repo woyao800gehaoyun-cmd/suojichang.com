@@ -1,0 +1,12 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import ArticleCard from '../../components/ArticleCard.astro';
+import { categories } from '../../data/site';
+export function getStaticPaths() { return categories.map(category => ({ params: { category: category.slug }, props: { category } })); }
+const { category } = Astro.props;
+const articles = (await getCollection('articles')).filter(a => a.data.category === category.name).sort((a,b) => +(b.data.updated || b.data.published) - +(a.data.updated || a.data.published));
+---
+<Base title={`${category.name}：梯子使用知识与实用指南`} description={category.description} schema={{ '@context': 'https://schema.org', '@type': 'CollectionPage', name: category.name, description: category.description, url: Astro.url.href }}>
+  <div class="container"><div class="page-intro"><div class="breadcrumbs"><a href="/">首页</a><span>/</span><a href="/articles/">全部文章</a><span>/</span><span>{category.name}</span></div><h1>{category.name}</h1><p>{category.description}</p></div><div class="page-body"><nav class="filter-bar" aria-label="文章分类"><a href="/articles/">全部文章</a>{categories.map(c => <a href={`/categories/${c.slug}/`} class:list={{ active: category.slug === c.slug }} aria-current={category.slug === c.slug ? 'page' : undefined}>{c.name}</a>)}</nav><p class="archive-count">本分类共 {articles.length} 篇指南</p><div class="article-grid">{articles.map(article => <ArticleCard article={article} />)}</div></div></div>
+</Base>

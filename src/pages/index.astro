@@ -1,0 +1,43 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import ArticleCard from '../components/ArticleCard.astro';
+import ProviderCard from '../components/ProviderCard.astro';
+import { providers, providerDisclosure } from '../data/providers';
+import { aiTools, clients, scenarios, questions, guideIds } from '../data/hubs';
+const providerRank=(id:string)=>{const rank=providers.findIndex(p=>p.article===id);return rank<0?providers.length:rank;};
+const articles=(await getCollection('articles')).sort((a,b)=>+(b.data.updated||b.data.published)-+(a.data.updated||a.data.published)||providerRank(a.id)-providerRank(b.id)||a.id.localeCompare(b.id));
+const latest=articles.slice(0,6);
+const guides=guideIds.slice(0,6).map(id=>articles.find(a=>a.id===id)!);
+const deep=['2026-tizi-guide','iplc-vs-relay','native-ip-streaming'].map(id=>articles.find(a=>a.id===id)!);
+const faq=[
+  {q:'梯子和 VPN 有什么区别？',a:'“梯子”是用途口语，VPN 是一类网络连接技术及相关产品。订阅代理、商业 VPN 与自建服务器的配置方式、维护责任和流量接管范围不同，需要比较具体实现。',href:'/articles/tizi-vpn-vps/'},
+  {q:'这些推荐是怎样整理的？',a:'本站主推光年梯，并提供瞬云、云图与鲲鹏加速作对照。测评依据运营者提供的套餐信息，外部注册链接含推广参数；推荐不包含未经独立验证的速度、稳定性或解锁结论。',href:'/methodology/'},
+  {q:'原生 IP 和住宅 IP 是一回事吗？',a:'不是同一个维度。“原生”常描述地区属性，住宅或家宽通常描述网络归属或接入类型。平台功能是否可用还取决于账号、地区支持和 IP 信誉，需实际核验。',href:'/articles/native-ip-streaming/'},
+  {q:'长期使用，应该月付还是年付？',a:'第一次选择时，先用试用或低额月付验证自己的网络与用途。长期付款应同时考虑折扣、退款规则和未来服务风险，不能只比较折算月价。',href:'/articles/plans-and-pricing/'}
+];
+const faults=[
+  {title:'连上后打不开网页',symptom:'客户端正常，目标页面却无法打开',article:'connection-troubleshooting'},
+  {title:'订阅更新或导入失败',symptom:'下载超时、配置错误、节点不显示',article:'subscription-troubleshooting'},
+  {title:'晚高峰变慢、延迟变高',symptom:'白天正常，晚上卡顿或断续',article:'slow-at-night'},
+  {title:'AI 工具无法访问',symptom:'普通网页正常，AI 报错或长回答中断',article:'ai-connection-errors'},
+  {title:'DNS 或 TLS 错误',symptom:'域名解析失败、证书或握手错误',article:'dns-tls-errors'},
+  {title:'设备数或在线 IP 超限',symptom:'多设备使用、网络切换后被限制',article:'device-limit'}
+];
+---
+<Base title="2026梯子推荐｜稳定梯子选择、客户端教程与使用指南" description="2026梯子推荐：整理梯子品牌资料、套餐与线路选择、ChatGPT 和 Claude 使用环境、Clash 与小火箭教程，以及订阅、节点和网络故障排查。" schema={{'@context':'https://schema.org','@type':'CollectionPage',name:'2026梯子推荐',url:Astro.site?.href}}>
+  <div class="container home-page">
+    <section class="home-intro"><div class="intro-main"><span class="intro-label">梯子推荐 · 使用指南 · 客户端教程</span><h1>2026梯子推荐</h1><p>本站主推光年梯：18元月付、120G流量、IEPL专线，优惠码GNT80。同时对比瞬云、云图与12元直连的鲲鹏加速，附各家测评、优惠信息与客户端教程。</p><div class="intro-actions"><a class="button" href="#recommendations">查看本期推荐</a><a class="secondary-button" href="/guides/">第一次使用？先看指南</a></div><div class="site-stats"><span><strong>{articles.length}</strong> 篇文章</span><span><strong>{providers.length}</strong> 家品牌资料</span><span><strong>{clients.length}</strong> 款客户端教程</span></div></div><aside class="intro-reading"><h2>不知道从哪里开始？</h2><a href="/articles/guangnianti-review/"><strong>主推：光年梯机场</strong><span>18元 / 120G / IEPL · 优惠码 GNT80</span></a><a href="/articles/subscription-import/"><strong>订阅怎么用</strong><span>Clash、小火箭与订阅链接保护</span></a><a href="/articles/connection-troubleshooting/"><strong>连接出问题</strong><span>从本地网络到节点逐层检查</span></a></aside></section>
+    <nav class="section-jumps" aria-label="首页板块"><a href="#recommendations">梯子推荐</a><a href="#scenarios">使用场景</a><a href="#ai-tools">AI 使用</a><a href="#beginner-guides">新手指南</a><a href="#client-tutorials">客户端</a><a href="#troubleshooting">故障排查</a><a href="#latest">最新文章</a></nav>
+    <section class="catalog-section" id="popular-questions"><header class="section-heading"><div><h2>热门问题</h2><p>先看答案，再按需要阅读详细步骤。</p></div><a href="/questions/">全部问题 →</a></header><div class="question-grid">{questions.slice(0,6).map(q=><a class="question-card" href={`/articles/${q.article}/`}><h3>{q.q}</h3><p>{q.a}</p></a>)}</div></section>
+    <section class="catalog-section" id="recommendations"><header class="section-heading"><div><h2>2026 梯子推荐与优惠</h2><p>先看套餐与线路，再用自己的网络验证实际体验。</p></div><a href="/brands/">测评与套餐对比 →</a></header><div class="provider-grid">{providers.map(provider=><ProviderCard provider={provider} />)}</div><p class="source-note">{providerDisclosure}</p></section>
+    <section class="catalog-section" id="scenarios"><header class="section-heading"><div><h2>按需求选择梯子</h2><p>不同用途，重点检查的条件也不同。</p></div><a href="/scenarios/">全部场景 →</a></header><div class="scenario-grid">{scenarios.map(s=><a class="scenario-card" href={`/articles/${s.article}/`}><span class="platform-label">{s.label}</span><h3>{s.name}</h3><p>{s.description}</p></a>)}</div></section>
+    <section class="catalog-section" id="ai-tools"><header class="section-heading"><div><h2>AI 使用环境</h2><p>支持地区、账号条件、客户端分流和长连接，分开检查。</p></div><a href="/ai/">全部 AI 指南 →</a></header><div class="tool-grid">{aiTools.map(tool=><a class="tool-card" href={`/articles/${tool.article}/`}><span class="tool-mark">{tool.mark}</span><h3>{tool.name}</h3><p>{tool.description}</p><span class="read-link">查看专题 →</span></a>)}</div></section>
+    <div class="paired-sections"><section class="catalog-section" id="beginner-guides"><header class="section-heading"><div><h2>梯子新手指南</h2><p>概念、选择、线路和订阅，从基础开始。</p></div><a href="/guides/">全部指南 →</a></header><div class="guide-list">{guides.map((a,i)=><a href={`/articles/${a.id}/`}><span>{String(i+1).padStart(2,'0')}</span><div><h3>{a.data.title}</h3><p>{a.data.category} · {a.data.readingMinutes} 分钟阅读</p></div><b aria-hidden="true">›</b></a>)}</div></section><section class="catalog-section" id="client-tutorials"><header class="section-heading"><div><h2>客户端教程</h2><p>安装来源、订阅、分流与排错。</p></div><a href="/clients/">全部客户端 →</a></header><div class="compact-client-grid">{clients.map(client=><a class="client-card" href={`/articles/${client.article}/`}><h3>{client.name}</h3><span class="platform-label">{client.platforms}</span><p>{client.description}</p></a>)}</div></section></div>
+    <section class="catalog-section" id="troubleshooting"><header class="section-heading"><div><h2>网络故障解决</h2><p>按出现的症状定位，减少反复改配置。</p></div><a href="/categories/troubleshooting/">排查文章 →</a></header><div class="fault-grid">{faults.map(f=><a class="fault-card" href={`/articles/${f.article}/`}><span>{f.symptom}</span><h3>{f.title}</h3><span class="read-link">查看排查步骤 →</span></a>)}</div></section>
+    <section class="catalog-section" id="latest"><header class="section-heading"><div><h2>最新文章</h2><p>按文章更新时间排列。</p></div><a href="/articles/">全部 {articles.length} 篇文章 →</a></header><div class="article-grid">{latest.map(article=><ArticleCard article={article} />)}</div></section>
+    <section class="catalog-section" id="deep-guides"><header class="section-heading"><div><h2>深度指南</h2><p>把选择标准、线路差异和 IP 类型系统讲清楚。</p></div><a href="/guides/">更多指南 →</a></header><div class="article-grid">{deep.map(article=><ArticleCard article={article} />)}</div></section>
+    <section class="catalog-section faq-section"><header class="section-heading"><div><h2>关于梯子推荐的常见问题</h2><p>概念、资料依据和长期使用建议。</p></div></header><div class="faq-list">{faq.map(q=><details><summary>{q.q}<span aria-hidden="true">+</span></summary><p>{q.a} <a href={q.href}>继续阅读 →</a></p></details>)}</div></section>
+    <section class="topic-strip"><h2>更多专题</h2><div><a href="/articles/plans-and-pricing/">便宜梯子与价格</a><a href="/articles/iplc-vs-relay/">IPLC 专线</a><a href="/articles/node-multiplier/">节点倍率</a><a href="/articles/region-nodes/">地区节点</a><a href="/articles/privacy-and-logging/">隐私与日志</a><a href="/articles/provider-risk/">官网入口与风险</a><a href="/topics/">全部主题 →</a></div></section>
+  </div>
+</Base>

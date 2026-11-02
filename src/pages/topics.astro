@@ -1,0 +1,8 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import { topicGroups, topicArticle as target } from '../data/site';
+---
+<Base title="梯子主题索引：价格、节点、客户端、地区与故障查询" description="按主题查找梯子推荐、套餐价格、IPLC 专线、地区节点、Windows 与 iOS 客户端、AI 和流媒体使用、订阅失败与连接故障的解释。">
+<div class="container"><div class="page-intro"><div class="breadcrumbs"><a href="/">首页</a><span>/</span><span>主题索引</span></div><h1>主题索引</h1><p>把常见叫法和具体问题放在一起，点击主题即可前往对应指南。地区与服务类型是阅读入口，不代表已完成供应商实测。</p></div><div class="page-body"><nav class="topic-anchor-list" aria-label="主题分组">{topicGroups.map((g,i) => <a href={`#group-${i}`}>{g.title}</a>)}</nav><div class="topic-grid">{topicGroups.map((g,i) => <section class="topic-group" id={`group-${i}`}><h2>{g.title}</h2><p>{g.intro}</p><div class="topic-terms">{g.terms.map(term => <a href={`/articles/${target(term,g.article)}/`}>{term}</a>)}</div><a class="text-link" href={`/articles/${g.article}/`}>从本主题指南开始 <Icon name="arrow" size={17} /></a></section>)}</div></div></div>
+</Base>

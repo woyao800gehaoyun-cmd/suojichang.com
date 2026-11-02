@@ -1,0 +1,12 @@
+---
+import type { providers } from '../data/providers';
+interface Props { provider: (typeof providers)[number] }
+const { provider:p } = Astro.props;
+---
+<article class:list={['provider-card',{'is-featured':p.featured}]}>
+  <div class="provider-header"><span class="provider-avatar" aria-hidden="true">{p.initial}</span><div><h3><a href={`/articles/${p.article}/`}>{p.name}</a></h3><div class="provider-tags">{p.tags.map(tag=><span>{tag}</span>)}</div></div><div class="provider-price"><strong>¥{p.price}</strong><small>/ 月</small></div></div>
+  <p>{p.summary}</p>
+  {p.featured && <ul class="provider-highlights">{p.advantages.map(text=><li>{text}</li>)}</ul>}
+  <dl class="provider-facts"><div><dt>月流量</dt><dd>{p.traffic}</dd></div><div><dt>线路类型</dt><dd>{p.lines}</dd></div><div><dt>优惠码</dt><dd>{p.coupon ? <code>{p.coupon}</code> : '暂无优惠码'}</dd></div></dl>
+  <div class="provider-actions"><a class="provider-visit" href={p.entry} target="_blank" rel="sponsored noopener noreferrer">{p.featured?'前往光年梯':'前往注册'} ↗</a><a href={`/articles/${p.article}/`}>阅读测评 →</a></div>
+</article>

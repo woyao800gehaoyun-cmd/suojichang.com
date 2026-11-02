@@ -1,0 +1,10 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import ArticleCard from '../../components/ArticleCard.astro';
+import { categories } from '../../data/site';
+const articles = (await getCollection('articles')).sort((a,b) => +(b.data.updated || b.data.published) - +(a.data.updated || a.data.published));
+---
+<Base title="全部文章：梯子选择、线路知识、设备教程与排障" description="浏览2026梯子推荐全部文章，按选购指南、线路与协议、设备教程、使用场景和故障排查阅读。">
+  <div class="container"><div class="page-intro"><div class="breadcrumbs"><a href="/">首页</a><span>/</span><span>全部文章</span></div><h1>全部文章</h1><p>按分类查找选购指南、客户端教程与故障排查文章。</p></div><div class="page-body"><nav class="filter-bar" aria-label="文章分类"><a href="/articles/" class="active" aria-current="page">全部文章</a>{categories.map(c => <a href={`/categories/${c.slug}/`}>{c.name}</a>)}</nav><p class="archive-count">共 {articles.length} 篇指南 · 按内容更新时间排列</p><div class="article-grid">{articles.map(article => <ArticleCard article={article} />)}</div></div></div>
+</Base>
