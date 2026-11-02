@@ -5,12 +5,12 @@ export const aiTools = [
 ] as const;
 
 export const clients = [
-  {name:'Clash Verge Rev', platforms:'Windows / Mac / Linux', description:'安装、远程配置、规则选择、系统代理与 TUN 检查。', article:'clash-verge-guide'},
-  {name:'Shadowrocket', platforms:'iPhone / iPad', description:'小火箭订阅添加、节点更新、连接测试与订阅保护。', article:'shadowrocket-guide'},
-  {name:'v2rayN', platforms:'以项目当前系统支持为准', description:'服务订阅、核心兼容、系统代理与应用分流核对。', article:'v2rayn-guide'},
-  {name:'v2rayNG', platforms:'Android', description:'导入配置、启用 VPN、后台运行和安卓常见错误。', article:'v2rayng-guide'},
-  {name:'sing-box', platforms:'多平台，按实现选择', description:'配置版本、图形客户端与命令行、DNS 和路由迁移。', article:'sing-box-guide'},
-  {name:'Stash', platforms:'iOS / macOS，按商店说明', description:'兼容配置、规则、网络权限与日志排错。', article:'stash-guide'}
+  {name:'Clash Verge Rev', platforms:'Windows / Mac / Linux', description:'安装、远程配置、规则选择、系统代理与 TUN 检查。', article:'clash-verge-guide', source:'https://github.com/clash-verge-rev/clash-verge-rev/releases', format:'Clash / Mihomo 兼容配置'},
+  {name:'Shadowrocket', platforms:'iPhone / iPad', description:'小火箭订阅添加、节点更新、连接测试与订阅保护。', article:'shadowrocket-guide', source:'https://apps.apple.com/app/shadowrocket/id932747118', format:'服务方提供的 Shadowrocket 订阅'},
+  {name:'v2rayN', platforms:'以项目当前系统支持为准', description:'服务订阅、核心兼容、系统代理与应用分流核对。', article:'v2rayn-guide', source:'https://github.com/2dust/v2rayN/releases', format:'与选用内核兼容的订阅'},
+  {name:'v2rayNG', platforms:'Android', description:'导入配置、启用 VPN、后台运行和安卓常见错误。', article:'v2rayng-guide', source:'https://github.com/2dust/v2rayNG/releases', format:'v2rayNG 兼容节点订阅'},
+  {name:'sing-box', platforms:'多平台，按实现选择', description:'配置版本、图形客户端与命令行、DNS 和路由迁移。', article:'sing-box-guide', source:'https://sing-box.sagernet.org/', format:'匹配当前版本的 sing-box 配置'},
+  {name:'Stash', platforms:'iOS / macOS，按商店说明', description:'兼容配置、规则、网络权限与日志排错。', article:'stash-guide', source:'https://stash.wiki/', format:'Stash 支持的配置格式'}
 ] as const;
 
 export const scenarios = [

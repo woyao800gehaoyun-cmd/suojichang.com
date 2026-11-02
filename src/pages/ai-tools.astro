@@ -1,0 +1,16 @@
+---
+import Base from '../layouts/Base.astro';
+import AIToolCard from '../components/AIToolCard.astro';
+import { aiCategories, directoryTools } from '../data/ai-directory';
+import { aiTools } from '../data/hubs';
+const schema = {'@context':'https://schema.org','@type':'CollectionPage',name:'AI 工具导航',url:new URL('/ai-tools/',Astro.site).href,mainEntity:{'@type':'ItemList',numberOfItems:directoryTools.length,itemListElement:directoryTools.map((tool,i)=>({'@type':'ListItem',position:i+1,name:tool.name,url:tool.url}))}};
+---
+<Base title="AI 工具导航：对话、搜索、编程、绘图与办公官网入口" description="按用途整理 ChatGPT、Claude、Gemini、DeepSeek、Cursor、Perplexity 等 AI 工具，覆盖对话、研究、编程、办公、图像、视频、音频、自动化和本地模型，点击直达官网。" schema={schema}>
+  <div class="container page-body">
+    <header class="page-intro"><nav class="breadcrumbs" aria-label="面包屑"><a href="/">首页</a><span>/</span><span>AI 工具</span></nav><h1>AI 工具导航</h1><p>按用途找工具，点击卡片直接打开官网。</p><div class="directory-meta">{directoryTools.length} 个工具 · {aiCategories.length} 个分类 · 整理日期：2026-11-02</div></header>
+    <nav class="directory-categories" aria-label="AI 工具分类">{aiCategories.map(category=><a href={`#${category.id}`}>{category.name}<span>{directoryTools.filter(tool=>tool.category===category.id).length}</span></a>)}</nav>
+    <p class="directory-note">以下链接前往各工具官方入口。部分功能需要登录、订阅或客户端，是否可用以平台支持地区与账号条件为准。</p>
+    {aiCategories.map(category=><section class="directory-section" id={category.id}><header class="section-heading"><div><h2>{category.name}</h2><p>{category.description}</p></div><a href="#main">回到分类 ↑</a></header><div class="directory-grid">{directoryTools.filter(tool=>tool.category===category.id).map(tool=><AIToolCard tool={tool}/>)}</div></section>)}
+    <section class="catalog-section"><header class="section-heading"><div><h2>打不开或使用出错？</h2><p>对照账号、地区和网络条件，按平台查看处理步骤。</p></div><a href="/articles/ai-connection-errors/">通用排查 →</a></header><div class="question-grid">{aiTools.map(tool=><a class="question-card" href={`/articles/${tool.article}/`}><h3>{tool.title}</h3><p>{tool.description}</p><span class="read-link">阅读使用指南 →</span></a>)}</div></section>
+  </div>
+</Base>

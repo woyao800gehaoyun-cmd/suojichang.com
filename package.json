@@ -8,7 +8,7 @@
     "build": "astro build && node scripts/build-preview.mjs",
     "preview": "astro preview --host 0.0.0.0",
     "new:post": "node scripts/new-post.mjs",
-    "verify": "npm run build && node scripts/verify.mjs"
+    "verify": "npm run build && node scripts/verify.mjs && node scripts/verify-preview.mjs"
   },
   "dependencies": {
     "astro": "^5.16.0",

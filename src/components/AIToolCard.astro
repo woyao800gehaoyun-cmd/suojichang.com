@@ -1,0 +1,8 @@
+---
+interface Props {tool:{name:string;url:string;description:string;tag?:string}}
+const {tool} = Astro.props;
+---
+<a class="directory-card" href={tool.url} target="_blank" rel="noopener noreferrer">
+  <div class="directory-card-heading"><h3>{tool.name}</h3>{tool.tag && <span>{tool.tag}</span>}</div>
+  <p>{tool.description}</p><span class="directory-open">打开官网 <span aria-hidden="true">↗</span></span>
+</a>

@@ -13,14 +13,14 @@ npm run dev
 
 打开终端显示的本地地址，通常为 `http://localhost:4321/`。
 
-每次构建还会在项目根目录生成 `预览.html`。首页的样式、品牌标记和插图直接包含在 HTML 中，双击该文件也能看到完整配色与布局；里面的站内链接指向本地服务，因此浏览文章和搜索时仍需启动服务。请勿仅复制旧的 `dist/index.html` 而丢弃其他构建文件后部署。
+每次构建会在项目根目录生成 `预览.html` 和 `本地预览/`。双击 `预览.html` 即可浏览完整网站：导航、文章、分类与全文搜索均无需启动本地服务。移动或分享预览时，请将这两项放在同一个目录；重新构建会更新生成的预览目录。正式部署使用 `dist/`，不要用本地预览替代部署产物。
 
 ```powershell
 npm run verify
 npm run preview
 ```
 
-`verify` 先构建，再检查内部链接、锚点、文章元信息、结构化数据、关键词入口、RSS、站点地图和搜索索引。发布目录为 `dist`。
+`verify` 先构建，再检查内部链接、锚点、文章元信息、结构化数据、关键词入口、RSS、站点地图、AI 工具官网入口与搜索索引；同时检查全部本地预览链接，并运行离线全文搜索脚本。发布目录为 `dist`。
 
 ## 新增与更新文章
 
@@ -49,6 +49,9 @@ npm run new:post -- my-first-review "我的文章标题" "选购指南"
 | `src/styles/simple.css` | 浅灰蓝博客模板的配色、版式和响应式样式 |
 | `src/data/providers.ts` | 品牌资料、参考价格、来源与详情页映射 |
 | `src/data/hubs.ts` | AI、客户端、使用场景、常见问题和新手指南入口 |
+| `src/data/navigation.ts` | 桌面与移动端共享的栏目导航 |
+| `src/data/ai-directory.ts` | AI 工具分类、名称、介绍与官方地址 |
+| `src/pages/ai-tools.astro` | 可直接打开官网的完整 AI 工具导航 |
 | `src/pages/[hub].astro` | 六个内容中心：品牌、AI、客户端、指南、场景和问题 |
 | `src/pages/methodology.astro` | 核验方法与编辑原则 |
 | `templates/article.md` | 可复制的写作结构 |

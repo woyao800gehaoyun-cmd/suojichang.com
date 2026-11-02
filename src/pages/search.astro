@@ -3,18 +3,21 @@ import Base from '../layouts/Base.astro';
 import Icon from '../components/Icon.astro';
 import { getCollection } from 'astro:content';
 import ArticleCard from '../components/ArticleCard.astro';
+import { getSearchIndex } from '../lib/search-index';
 const articles = await getCollection('articles');
+const searchIndex = await getSearchIndex();
 ---
 <Base title="搜索文章" description="搜索2026梯子推荐的选择指南、设备教程、线路知识与故障排查文章。" noindex>
 <div class="container"><div class="page-intro"><div class="breadcrumbs"><a href="/">首页</a><span>/</span><span>搜索</span></div><h1>搜索文章</h1><p>输入客户端、线路名称或遇到的问题。</p></div><div class="page-body"><form class="search-form" role="search"><label class="skip-link" for="search-input">搜索文章</label><Icon name="search" size={23} /><input class="search-input" id="search-input" name="q" type="search" placeholder="例如：Clash、节点倍率、晚高峰……" autocomplete="off" /></form><div class="search-suggestions"><button type="button" data-query="Clash">Clash 订阅</button><button type="button" data-query="AI">AI 使用</button><button type="button" data-query="倍率">节点倍率</button><button type="button" data-query="价格">套餐价格</button></div><p class="search-hint" id="search-status" role="status" aria-live="polite">输入关键词搜索，也可以直接浏览下方文章。</p><div class="article-grid" id="search-results">{articles.map(article => <div class="search-card" data-id={article.id}><ArticleCard article={article} /></div>)}</div><p id="search-empty" class="empty-state" hidden>暂时没有找到匹配内容。试试更短的关键词，或前往 <a href="/topics/">主题索引</a>。</p><noscript><p>你的浏览器关闭了 JavaScript，请使用上方文章列表或主题索引浏览。</p></noscript></div></div>
-<script>
-  const input = document.querySelector<HTMLInputElement>('#search-input')!;
-  const form = document.querySelector<HTMLFormElement>('.search-form')!;
-  const status = document.querySelector<HTMLElement>('#search-status')!;
-  const empty = document.querySelector<HTMLElement>('#search-empty')!;
-  const cards = [...document.querySelectorAll<HTMLElement>('.search-card')];
-  let index: {id:string;text:string}[] = [];
-  const normalize = (text: string) => text.toLowerCase().normalize('NFKC').replaceAll('机场','梯子').replace(/\s+/g,' ');
+<script is:inline type="application/json" id="search-data" set:html={JSON.stringify(searchIndex).replace(/</g,'\\u003c')} />
+<script is:inline>
+  const input = document.querySelector('#search-input');
+  const form = document.querySelector('.search-form');
+  const status = document.querySelector('#search-status');
+  const empty = document.querySelector('#search-empty');
+  const cards = [...document.querySelectorAll('.search-card')];
+  const index = JSON.parse(document.querySelector('#search-data').textContent);
+  const normalize = (text) => text.toLowerCase().normalize('NFKC').replaceAll('机场','梯子').replace(/\s+/g,' ');
   const filter = () => {
     const query = input.value.trim();
     const terms = normalize(query).split(/\s+/).filter(Boolean);
@@ -22,13 +25,12 @@ const articles = await getCollection('articles');
     cards.forEach(card => { const item = index.find(i => i.id === card.dataset.id); const text = normalize(item?.text || card.textContent || ''); const match = terms.every(term => text.includes(term)); card.hidden = !match; if (match) count++; });
     status.textContent = query ? `找到 ${count} 篇与“${query}”相关的文章` : `共 ${cards.length} 篇文章，输入关键词开始搜索。`;
     empty.hidden = count > 0;
-    const url = new URL(location.href); if(query) url.searchParams.set('q',query); else url.searchParams.delete('q'); history.replaceState(null,'',url);
+    if (/^https?:$/.test(location.protocol)) { const url = new URL(location.href); if(query) url.searchParams.set('q',query); else url.searchParams.delete('q'); history.replaceState(null,'',url); }
   };
   input.value = new URL(location.href).searchParams.get('q') || '';
   form.addEventListener('submit', e => {e.preventDefault(); filter();});
   input.addEventListener('input', filter);
-  document.querySelectorAll<HTMLButtonElement>('[data-query]').forEach(button => button.addEventListener('click', () => { input.value = button.dataset.query!; filter(); input.focus(); }));
+  document.querySelectorAll('[data-query]').forEach(button => button.addEventListener('click', () => { input.value = button.dataset.query; filter(); input.focus(); }));
   filter();
-  fetch('/search-index.json').then(r => { if(!r.ok) throw new Error('index'); return r.json(); }).then(data => { index = data; filter(); }).catch(() => { status.textContent += '（当前仅匹配文章标题与摘要）'; });
 </script>
 </Base>

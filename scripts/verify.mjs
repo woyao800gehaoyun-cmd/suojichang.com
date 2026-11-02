@@ -3,6 +3,8 @@ import { resolve, relative, sep } from 'node:path';
 import { topicGroups, siteName } from '../src/data/site.ts';
 import { providers } from '../src/data/providers.ts';
 import { aiTools, clients, scenarios, questions, guideIds } from '../src/data/hubs.ts';
+import { primaryNavigation } from '../src/data/navigation.ts';
+import { aiCategories, directoryTools } from '../src/data/ai-directory.ts';
 
 const root = resolve('dist');
 const errors = [];
@@ -82,6 +84,24 @@ for(const id of ['popular-questions','recommendations','scenarios','ai-tools','b
 for(const item of [...providers,...aiTools,...clients,...scenarios,...questions]) check(source.has(resolve(root,`articles/${item.article}/index.html`)),`板块详情页缺失 ${item.article}`);
 for(const id of guideIds) check(source.has(resolve(root,`articles/${id}/index.html`)),`新手指南缺失 ${id}`);
 for(const hub of ['brands','ai','clients','guides','scenarios','questions']) check(source.has(resolve(root,`${hub}/index.html`)),`内容中心缺失 ${hub}`);
+for(const [file,html] of source) {
+  for(const name of ['desktop-nav','移动端导航']) {
+    const nav = name==='desktop-nav' ? html.match(/<nav class="desktop-nav"[^>]*>([\s\S]*?)<\/nav>/)?.[1] : html.match(/<nav aria-label="移动端导航"[^>]*>([\s\S]*?)<\/nav>/)?.[1];
+    check(Boolean(nav),`${relative(root,file)} 缺少${name}`);
+    for(const item of primaryNavigation) {
+      const expected = file===resolve(root,'index.html') && item.href.startsWith('/#') ? item.href.slice(1) : item.href;
+      check(nav?.includes(`href="${expected}"`),`${relative(root,file)}: ${name}缺少${item.label}入口`);
+    }
+  }
+}
+const aiPage = source.get(resolve(root,'ai-tools/index.html')) || '';
+check(new Set(directoryTools.map(t=>t.url)).size===directoryTools.length,'AI工具出现重复官网入口');
+for(const category of aiCategories) {
+  check(aiPage.includes(`id="${category.id}"`),`AI工具分类缺失 ${category.name}`);
+  check(directoryTools.some(t=>t.category===category.id),`AI工具分类为空 ${category.name}`);
+}
+for(const tool of directoryTools) check(aiPage.includes(`href="${tool.url}" target="_blank" rel="noopener noreferrer"`),`AI工具缺少直达官网链接 ${tool.name}`);
+for(const client of clients) check(source.get(resolve(root,'clients/index.html'))?.includes(`href="${client.source}"`),`客户端缺少官方获取入口 ${client.name}`);
 const topicText = texts.get(resolve(root,'topics/index.html')) || '';
 const keywords = topicGroups.flatMap(g => [...g.terms]);
 for(const keyword of keywords) check(topicText.includes(keyword),`主题索引缺少关键词: ${keyword}`);
@@ -99,7 +119,9 @@ check((await readFile(resolve(root,'robots.txt'),'utf8')).includes(`${origin}/si
 check((await readFile(resolve(root,'llms.txt'),'utf8')).includes(`${origin}/articles/`),'llms.txt 缺少文章链接');
 await access(resolve(root,'images/social-card.png'));
 const preview = await readFile(resolve('预览.html'),'utf8');
-check(preview.includes('<base href="http://localhost:4321/">'),'独立预览缺少站内导航基准地址');
+check(!preview.includes('<base '),'独立预览仍依赖远程或本地服务基准地址');
+check(preview.includes('href="本地预览/guides/index.html"'),'独立预览新手指南没有指向生成的本地文件');
+check(preview.includes('href="本地预览/ai-tools/index.html"'),'独立预览AI工具没有指向生成的本地文件');
 check(!/<img\b/.test(preview),'独立首页预览仍依赖外部图片');
 if(errors.length) { console.error(`\n验证失败（${errors.length} 项）:\n`+errors.map(e=>'- '+e).join('\n')); process.exit(1); }
 console.log(`\n验证通过：${htmlFiles.length} 个 HTML 页面、${articleCount} 篇文章、${keywords.length} 个主题词、${internalLinks} 个内部链接/资源。`);

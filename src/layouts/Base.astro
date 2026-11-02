@@ -3,6 +3,7 @@ import globalStyles from '../styles/simple.css?raw';
 import { siteName } from '../data/site';
 import Icon from '../components/Icon.astro';
 import BrandMark from '../components/BrandMark.astro';
+import { primaryNavigation, moreNavigation } from '../data/navigation';
 interface Props { title: string; description: string; schema?: Record<string, unknown> | Record<string, unknown>[]; noindex?: boolean; type?: string }
 const { title, description, schema, noindex = false, type = 'website' } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
@@ -45,10 +46,10 @@ const baseSchema = {
       <div class="container header-inner">
         <a href="/" class="brand" aria-label={`${siteName}首页`}><BrandMark /><span>{siteName}</span></a>
         <nav class="desktop-nav" aria-label="主导航">
-          <a href="/#recommendations">梯子推荐</a><a href="/guides/" aria-current={Astro.url.pathname==='/guides/'?'page':undefined}>新手指南</a><a href="/ai/" aria-current={Astro.url.pathname==='/ai/'?'page':undefined}>AI 使用</a><a href="/clients/" aria-current={Astro.url.pathname==='/clients/'?'page':undefined}>客户端</a><a href="/categories/troubleshooting/">网络问题</a><a href="/brands/" aria-current={Astro.url.pathname==='/brands/'?'page':undefined}>品牌资料</a>
+          {primaryNavigation.map(item=><a href={Astro.url.pathname==='/' && item.href.startsWith('/#') ? item.href.slice(1) : item.href} aria-current={Astro.url.pathname===item.href?'page':undefined}>{item.label}</a>)}
         </nav>
         <a class="header-search" href="/search/" aria-label="搜索文章"><Icon name="search" size={19} /><span>搜索</span></a>
-        <details class="mobile-menu"><summary aria-label="展开导航"><span></span><span></span><span></span></summary><nav aria-label="移动端导航"><a href="/#recommendations">梯子推荐</a><a href="/guides/">新手指南</a><a href="/ai/">AI 使用环境</a><a href="/clients/">客户端教程</a><a href="/brands/">品牌资料</a><a href="/categories/troubleshooting/">故障排查</a><a href="/questions/">常见问题</a><a href="/articles/">全部文章</a><a href="/topics/">主题索引</a></nav></details>
+        <details class="mobile-menu"><summary aria-label="展开导航"><span></span><span></span><span></span></summary><nav aria-label="移动端导航">{[...primaryNavigation,...moreNavigation].map(item=><a href={Astro.url.pathname==='/' && item.href.startsWith('/#') ? item.href.slice(1) : item.href} aria-current={Astro.url.pathname===item.href?'page':undefined}>{item.label}</a>)}</nav></details>
       </div>
     </header>
     <main id="main"><slot /></main>
