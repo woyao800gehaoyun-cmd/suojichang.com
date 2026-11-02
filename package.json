@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "indexnow": "node scripts/indexnow.mjs",
     "start": "node scripts/start-blog.mjs",
     "dev": "astro dev --host 0.0.0.0",
     "build": "astro build && node scripts/build-preview.mjs",

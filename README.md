@@ -88,6 +88,14 @@ GitHub 仓库：https://github.com/woyao800gehaoyun-cmd/suojichang.com 。推送
 
 更换域名后需重新构建，canonical、robots、RSS 和站点地图会使用新域名。不要以临时预览域名提交正式索引。若公开预览环境也有收录风险，应在托管平台对预览环境设置 `X-Robots-Tag: noindex`。
 
+## IndexNow
+
+本站已配置 IndexNow。验证键与正式域名在 `indexnow.config.json`，对应 UTF-8 验证文件位于 `public/01ff230948474addb4339ddf460f8068.txt`，部署后应能通过正式域名根路径访问。该验证键需要公开，无需添加 GitHub Secret。
+
+更新文章、栏目或公共文件并推送 `main` 后，`Submit URLs to IndexNow` 工作流会等待部署，核对线上验证文件，再提交线上站点地图中的网址。也可以在 Actions 手动运行该工作流。提交内容会去重，仅允许本站 HTTPS 网址，不提交搜索和 404 页面。
+
+手动提交：`npm run indexnow`。本地检查而不发送：`npm run indexnow -- --dry-run`（先构建）。更换域名时同步修改站点构建域名与 `indexnow.config.json`。HTTP 200 表示已接收，202 表示已接收但等待验证；提交不等于已收录。部署尚未发布验证文件时脚本会明确报错。
+
 ## 长期维护建议
 
 每周按读者真实问题更新一篇文章，避免只改标题年份。每月复查客户端维护状态、关键来源与高流量页面；每季度回看内容覆盖与内部链接。套餐、优惠、支持地区与实测结论应在发布时重新核验，并留下可复查记录。

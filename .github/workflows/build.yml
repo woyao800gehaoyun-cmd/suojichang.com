@@ -15,6 +15,8 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run verify
+      - run: npm run indexnow -- --dry-run
+      - run: node scripts/verify-indexnow.mjs
       - uses: actions/upload-artifact@v4
         with:
           name: website-dist

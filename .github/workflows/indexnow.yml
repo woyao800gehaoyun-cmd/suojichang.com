@@ -1,0 +1,33 @@
+name: Submit URLs to IndexNow
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'src/content/**'
+      - 'src/data/**'
+      - 'src/pages/**'
+      - 'public/**'
+      - 'astro.config.mjs'
+      - 'indexnow.config.json'
+      - 'scripts/indexnow.mjs'
+      - '.github/workflows/indexnow.yml'
+permissions:
+  contents: read
+concurrency:
+  group: indexnow-main
+  cancel-in-progress: false
+jobs:
+  submit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      # Give the connected hosting platform time to publish this commit.
+      - name: Wait for deployment
+        run: sleep 60
+      - name: Verify live key and submit live sitemap
+        run: node scripts/indexnow.mjs --wait
