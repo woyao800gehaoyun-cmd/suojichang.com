@@ -4,6 +4,8 @@
 
 ## 本地运行
 
+Windows 用户可直接双击项目根目录的 `start-blog.cmd`。它会启动本地网站并自动打开 Edge，固定地址为 `http://127.0.0.1:4173/`；导航使用正常 HTTP 路由，不依赖聊天软件打开文件时采用的路径。也可运行 `npm start`，重复启动会复用已运行的服务。
+
 需要 Node.js 22.18+（或当前 LTS）和 npm。验证脚本使用 Node 原生 TypeScript 类型剥离支持。
 
 ```powershell
