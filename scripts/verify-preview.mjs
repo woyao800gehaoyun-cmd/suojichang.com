@@ -5,7 +5,7 @@ import vm from 'node:vm';
 
 const projectRoot = resolve(fileURLToPath(new URL('../',import.meta.url)));
 const previewRoot = resolve(projectRoot,'本地预览');
-const files = [resolve(projectRoot,'预览.html')];
+const files = [];
 async function walk(dir) {
   for(const entry of await readdir(dir,{withFileTypes:true})) {
     const path = resolve(dir,entry.name);
@@ -55,3 +55,19 @@ for(const [query,expected] of [['光年梯','guangnianti-review'],['GNT80','guan
 input.value='zzzz-no-result-012345'; listeners.get('input')();
 if(empty.hidden || cards.some(card=>!card.hidden)) throw new Error('离线搜索空状态错误');
 console.log(`本地预览验证通过：${files.length} 个 HTML 文件、${links} 个链接/锚点，离线全文搜索正常。`);
+
+// Exercise the portable entry after it has lost all neighbouring files.
+const standalone = await readFile(resolve(projectRoot,'预览.html'),'utf8');
+const bundled = standalone.match(/<script[^>]*id="preview-pages"[^>]*>([\s\S]*?)<\/script>/)[1];
+const runtime = [...standalone.matchAll(/<script([^>]*)>([\s\S]*?)<\/script>/g)].find(s=>!s[1].includes('type='))[2];
+const frame = {srcdoc:'',contentWindow:{}};
+const events = {};
+const location = {href:'file:///isolated/copy.html',hash:''};
+vm.runInNewContext(runtime,{document:{getElementById:id=>id==='preview-pages'?{textContent:bundled}:frame},window:{addEventListener:(type,fn)=>events[type]=fn},location,URL});
+for(const route of ['/','/guides/','/ai-tools/','/clients/','/categories/troubleshooting/','/brands/','/articles/guangnianti-review/','/search/']) {
+  location.hash='#'+route; events.hashchange();
+  if(!frame.srcdoc.includes('<h1') || !frame.srcdoc.includes('blog-preview:navigate')) throw new Error(`单文件预览路由失效：${route}`);
+}
+events.message({source:frame.contentWindow,data:{type:'blog-preview:navigate',route:'/ai-tools/'}});
+if(location.hash!=='#/ai-tools/') throw new Error('单文件预览点击消息未更新路由');
+console.log('单文件预览验证通过：单独复制后，全部导航入口、测评与搜索仍可渲染。');

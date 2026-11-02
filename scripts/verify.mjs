@@ -120,8 +120,10 @@ check((await readFile(resolve(root,'llms.txt'),'utf8')).includes(`${origin}/arti
 await access(resolve(root,'images/social-card.png'));
 const preview = await readFile(resolve('预览.html'),'utf8');
 check(!preview.includes('<base '),'独立预览仍依赖远程或本地服务基准地址');
-check(preview.includes('href="本地预览/guides/index.html"'),'独立预览新手指南没有指向生成的本地文件');
-check(preview.includes('href="本地预览/ai-tools/index.html"'),'独立预览AI工具没有指向生成的本地文件');
+const previewPages = JSON.parse(preview.match(/<script[^>]*id="preview-pages"[^>]*>([\s\S]*?)<\/script>/)?.[1] || '{}');
+check(Object.keys(previewPages).length===htmlFiles.length,'单文件预览没有包含全部页面');
+check(Boolean(previewPages['/guides/']),'单文件预览缺少新手指南');
+check(Boolean(previewPages['/ai-tools/']),'单文件预览缺少AI工具');
 check(!/<img\b/.test(preview),'独立首页预览仍依赖外部图片');
 if(errors.length) { console.error(`\n验证失败（${errors.length} 项）:\n`+errors.map(e=>'- '+e).join('\n')); process.exit(1); }
 console.log(`\n验证通过：${htmlFiles.length} 个 HTML 页面、${articleCount} 篇文章、${keywords.length} 个主题词、${internalLinks} 个内部链接/资源。`);

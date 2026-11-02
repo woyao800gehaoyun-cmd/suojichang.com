@@ -1,6 +1,7 @@
 import { cp, readFile, writeFile, readdir, access, rm } from 'node:fs/promises';
 import { resolve, relative, dirname, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { createStandalonePreview } from './standalone-preview.mjs';
 
 const projectRoot = fileURLToPath(new URL('../', import.meta.url));
 const distRoot = resolve(projectRoot,'dist');
@@ -39,5 +40,17 @@ function localLinks(html, outputPath) {
 }
 for(const file of htmlFiles) await writeFile(file,localLinks(await readFile(file,'utf8'),file));
 const shortcut = resolve(projectRoot,'预览.html');
-await writeFile(shortcut,localLinks(await readFile(resolve(distRoot,'index.html'),'utf8'),shortcut));
-console.log(`已生成完整本地预览：预览.html + 本地预览/（${htmlFiles.length} 页，无需启动服务）`);
+const favicon = 'data:image/svg+xml;base64,'+Buffer.from(await readFile(resolve(distRoot,'favicon.svg'))).toString('base64');
+const rss = 'data:application/rss+xml;base64,'+Buffer.from(await readFile(resolve(distRoot,'rss.xml'))).toString('base64');
+const pages = {};
+for(const file of htmlFiles) {
+  const path = relative(previewRoot,file).split(sep).join('/');
+  const route = '/'+path.replace(/index\.html$/,'');
+  pages[route] = (await readFile(resolve(distRoot,path),'utf8'))
+    .replaceAll('href="/favicon.svg"',`href="${favicon}"`)
+    .replaceAll('href="/rss.xml"',`href="${rss}"`);
+}
+const standalone = createStandalonePreview(pages,favicon);
+await writeFile(shortcut,standalone);
+await writeFile(resolve(projectRoot,'完整博客预览.html'),standalone);
+console.log(`已生成单文件完整预览：完整博客预览.html（另保留预览.html，内含 ${htmlFiles.length} 页，可单独复制）`);
