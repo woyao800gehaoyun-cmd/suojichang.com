@@ -1,10 +1,11 @@
 ---
 import type { providers } from '../data/providers';
+import { providerCoupon, providerPrice } from '../data/providers';
 interface Props { provider: (typeof providers)[number] }
 const { provider:p } = Astro.props;
 ---
 <aside class:list={['provider-offer',{'is-featured':p.featured}]} aria-label={`${p.name}套餐与优惠`}>
-  <div><span class="offer-label">{p.featured?'本站主推':'套餐速览'}</span><strong>{p.name} · ¥{p.price}/月</strong><p>{p.traffic} · {p.lines}</p></div>
-  <div class="offer-checkout"><span>优惠码：{p.coupon ? <code>{p.coupon}</code> : '暂无'}</span><a class="button" href={p.entry} target="_blank" rel="sponsored noopener noreferrer">前往注册 / 查看套餐 ↗</a></div>
+  <div><span class="offer-label">{p.featured?'本站主推':'套餐速览'}</span><strong>{p.name} · {providerPrice(p)}</strong><p>{p.traffic} · {p.lines}</p></div>
+  <div class="offer-checkout"><span>优惠码：{p.coupon ? <code>{p.coupon}</code> : providerCoupon(p)}</span><a class="button" href={p.entry} target="_blank" rel="sponsored noopener noreferrer">前往注册 / 查看套餐 ↗</a></div>
   <p class="offer-note">此为推广入口。套餐信息由站点运营者提供，优惠适用范围与实际支付金额以结算页为准。</p>
 </aside>

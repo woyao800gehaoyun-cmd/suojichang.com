@@ -69,12 +69,12 @@ for (const [file, html] of source) {
 const topicHtml = source.get(resolve(root,'topics/index.html')) || '';
 const homepage = source.get(resolve(root,'index.html')) || '';
 const brandPage = source.get(resolve(root,'brands/index.html')) || '';
-check(providers.length===4 && providers[0].id==='guangnianti' && providers[0].featured,'推荐区必须包含四家且光年梯为首位主推');
+check(providers.map(p=>p.id).join(',')==='guangnianti,shunyun,jilianyun,yuntu,edge-nodes,bianjieyun,kunpeng' && providers[0].id==='guangnianti' && providers[0].featured,'推荐区必须按七家指定顺序展示且光年梯为首位主推');
 for(const provider of providers) {
   const review = source.get(resolve(root,`articles/${provider.article}/index.html`)) || '';
   for(const [label,page] of [['首页',homepage],['品牌页',brandPage],['测评页',review]]) {
     check(page.includes(`href="${provider.entry}"`),`${label}: ${provider.name}推广地址不完整`);
-    check(page.includes(provider.coupon || '暂无'),`${label}: ${provider.name}优惠码缺失`);
+    check(page.includes(provider.coupon || ('couponStatus' in provider ? provider.couponStatus : '暂无')),`${label}: ${provider.name}优惠码缺失`);
   }
   check(review.includes('sponsored noopener noreferrer'),`${provider.name}: 推广入口缺少关系标记`);
 }
