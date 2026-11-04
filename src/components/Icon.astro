@@ -2,6 +2,7 @@
 interface Props { name: string; size?: number; class?: string }
 const { name, size = 24, class: className } = Astro.props;
 const paths: Record<string, string> = {
+  plane: 'm22 2-7 20-4-9-9-4L22 2ZM22 2 11 13',
   compass: 'M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20ZM16 8l-2 6-6 2 2-6 6-2Z',
   route: 'M4 6h12a4 4 0 0 1 0 8H8a4 4 0 0 0 0 8h12M4 3v6M20 19v4',
   monitor: 'M3 3h18v13H3V3Zm5 18h8M12 16v5',

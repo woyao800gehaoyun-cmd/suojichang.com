@@ -51,6 +51,7 @@ const baseSchema = {
           {primaryNavigation.map(item=><a href={Astro.url.pathname==='/' && item.href.startsWith('/#') ? item.href.slice(1) : item.href} aria-current={Astro.url.pathname===item.href?'page':undefined}>{item.label}</a>)}
         </nav>
         <a class="header-search" href="/search/" aria-label="搜索文章"><Icon name="search" size={19} /><span>搜索</span></a>
+        <a class="header-contact" href="https://t.me/rumors6688" target="_blank" rel="noopener noreferrer" aria-label="Telegram 联系 @rumors6688" title="Telegram：@rumors6688"><Icon name="plane" size={21} /><span>@rumors6688</span></a>
         <details class="mobile-menu"><summary aria-label="展开导航"><span></span><span></span><span></span></summary><nav aria-label="移动端导航">{[...primaryNavigation,...moreNavigation].map(item=><a href={Astro.url.pathname==='/' && item.href.startsWith('/#') ? item.href.slice(1) : item.href} aria-current={Astro.url.pathname===item.href?'page':undefined}>{item.label}</a>)}</nav></details>
       </div>
     </header>

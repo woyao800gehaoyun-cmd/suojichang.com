@@ -1,7 +1,7 @@
 import { readdir, readFile, access } from 'node:fs/promises';
 import { resolve, relative, sep } from 'node:path';
 import { topicGroups, siteName } from '../src/data/site.ts';
-import { providers } from '../src/data/providers.ts';
+import { providers, providerPrice } from '../src/data/providers.ts';
 import { aiTools, clients, scenarios, questions, guideIds } from '../src/data/hubs.ts';
 import { primaryNavigation } from '../src/data/navigation.ts';
 import { aiCategories, directoryTools } from '../src/data/ai-directory.ts';
@@ -27,6 +27,7 @@ for (const [file, html] of source) {
   texts.set(file,text);
   check(/<style(?:\s[^>]*)?>[\s\S]{1000,}?<\/style>/.test(html),`${route}: 缺少不依赖 JavaScript 的内联站点样式`);
   check(html.includes('class="brand-mark"'),`${route}: 缺少内嵌品牌图标`);
+  check(html.includes('class="header-contact" href="https://t.me/rumors6688"'),`${route}: 缺少Telegram联系方式`);
   check((html.match(/<h1\b/g) || []).length === 1,`${route}: 必须恰好有一个 H1`);
   for(const oldBrand of ['二猫云','宇宙云','光速云','暮光网络','星岛梦']) check(!text.includes(oldBrand),`${route}: 仍包含已撤下的推荐 ${oldBrand}`);
   const title = html.match(/<title>([\s\S]*?)<\/title>/)?.[1];
@@ -69,14 +70,20 @@ for (const [file, html] of source) {
 const topicHtml = source.get(resolve(root,'topics/index.html')) || '';
 const homepage = source.get(resolve(root,'index.html')) || '';
 const brandPage = source.get(resolve(root,'brands/index.html')) || '';
-check(providers.map(p=>p.id).join(',')==='guangnianti,shunyun,jilianyun,yuntu,edge-nodes,bianjieyun,kunpeng' && providers[0].id==='guangnianti' && providers[0].featured,'推荐区必须按七家指定顺序展示且光年梯为首位主推');
+check(providers.map(p=>p.id).join(',')==='guangnianti,yuntu,jilianyun,shunyun,bianjieyun,edge-nodes,kunpeng' && providers[0].id==='guangnianti' && providers[0].featured,'推荐区必须按七家指定顺序展示且光年梯为首位主推');
 for(const provider of providers) {
   const review = source.get(resolve(root,`articles/${provider.article}/index.html`)) || '';
   for(const [label,page] of [['首页',homepage],['品牌页',brandPage],['测评页',review]]) {
     check(page.includes(`href="${provider.entry}"`),`${label}: ${provider.name}推广地址不完整`);
     check(page.includes(provider.coupon || ('couponStatus' in provider ? provider.couponStatus : '暂无')),`${label}: ${provider.name}优惠码缺失`);
+    if(label!=='首页') check(page.includes(providerPrice(provider)),`${label}: ${provider.name}价格或付款周期错误`);
   }
   check(review.includes('sponsored noopener noreferrer'),`${provider.name}: 推广入口缺少关系标记`);
+}
+for(const [label,page] of [['首页',homepage],['品牌页',brandPage]]) {
+  const order=[...page.matchAll(/class="provider-visit" href="([^"]+)"/g)].map(m=>m[1]);
+  check(order.join('|')===providers.map(p=>p.entry).join('|'),`${label}: 推荐卡片顺序不正确`);
+  check(page.includes('实际年付 ¥189') && !page.includes('<strong>¥189</strong><small>/ 月'),`${label}: 边界云年付金额显示错误`);
 }
 for(const oldSlug of ['ermaoyun-guide','yuzhouyun-guide','guangsu-guide','muguang-guide','xingdaomeng-guide']) check(!sourcemapHas(oldSlug),`旧推荐文章仍在产物中 ${oldSlug}`);
 function sourcemapHas(slug) { return source.has(resolve(root,`articles/${slug}/index.html`)); }

@@ -3,9 +3,11 @@ import type { providers } from '../data/providers';
 import { providerCoupon } from '../data/providers';
 interface Props { provider: (typeof providers)[number] }
 const { provider:p } = Astro.props;
+const yearly = 'billing' in p && p.billing==='year';
 ---
 <article class:list={['provider-card',{'is-featured':p.featured}]}>
-  <div class="provider-header"><span class="provider-avatar" aria-hidden="true">{p.initial}</span><div><h3><a href={`/articles/${p.article}/`}>{p.name}</a></h3><div class="provider-tags">{p.tags.map(tag=><span>{tag}</span>)}</div></div><div class="provider-price">{p.price ? <><strong>¥{p.price}</strong><small>/ 月</small></> : <small>价格待核实</small>}</div></div>
+  <div class="provider-header"><span class="provider-avatar" aria-hidden="true">{p.initial}</span><div><h3><a href={`/articles/${p.article}/`}>{p.name}</a></h3><div class="provider-tags">{p.tags.map(tag=><span>{tag}</span>)}</div></div><div class="provider-price">{p.price ? <><strong>¥{p.price}</strong><small>/ {yearly?'年':'月'}</small></> : <small>价格待核实</small>}</div></div>
+  {yearly && <p class="provider-billing">折合 ¥{'monthlyEquivalent' in p ? p.monthlyEquivalent : ''}/月，实际年付 ¥{p.price}</p>}
   <p>{p.summary}</p>
   {p.featured && <ul class="provider-highlights">{p.advantages.map(text=><li>{text}</li>)}</ul>}
   <dl class="provider-facts"><div><dt>月流量</dt><dd>{p.traffic}</dd></div><div><dt>线路类型</dt><dd>{p.lines}</dd></div><div><dt>优惠码</dt><dd>{p.coupon ? <code>{p.coupon}</code> : providerCoupon(p)}</dd></div></dl>
